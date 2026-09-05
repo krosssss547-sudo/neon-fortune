@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON FORTUNE — колесо удачи</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rubik:wght@400;500;700&display=swap');
+
+  :root{
+    --bg-0: #07040f;
+    --bg-1: #0e0821;
+    --magenta: #ff2ec4;
+    --cyan: #20e6ff;
+    --gold: #ffd23f;
+    --gold-deep: #b8860b;
+    --lose-red: #ff3860;
+    --text-dim: #a79fc2;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{
+    margin:0; padding:0; height:100%;
+    background: radial-gradient(ellipse at 50% 0%, var(--bg-1) 0%, var(--bg-0) 60%);
+    font-family: 'Rubik', sans-serif;
+    color: #f1edff;
+    overflow-x:hidden;
+  }
+
+  .stage{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding: 28px 16px 60px;
+    position:relative;
+  }
+
+  /* ---------- Title ---------- */
+  h1.marquee{
+    font-family:'Orbitron', sans-serif;
+    font-weight:900;
+    font-size: clamp(28px, 6vw, 46px);
+    letter-spacing: 3px;
+    margin: 4px 0 2px;
+    text-align:center;
+    color:#fff;
+    text-shadow:
+      0 0 6px var(--magenta),
+      0 0 18px var(--magenta),
+      0 0 40px rgba(255,46,196,0.5);
+  }
+  .subtitle{
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-bottom: 22px;
+    text-align:center;
+  }
+
+  /* ---------- Balance readout ---------- */
+  .balance-panel{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background: linear-gradient(180deg, #1a1030, #0c0818);
+    border: 1px solid rgba(32,230,255,0.35);
+    border-radius: 14px;
+    padding: 10px 22px;
+    box-shadow: 0 0 20px rgba(32,230,255,0.15), inset 0 0 12px rgba(32,230,255,0.08);
+    margin-bottom: 26px;
+  }
+  .balance-label{
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+  }
+  .balance-value{
+    font-family:'Orbitron', sans-serif;
+    font-size: 32px;
+    font-weight:700;
+    color: var(--gold);
+    text-shadow: 0 0 8px var(--gold), 0 0 20px rgba(255,210,63,0.6);
+    min-width: 100px;
+  }
+  .crip-icon{
+    width:30px; height:30px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #fff6cf, var(--gold) 55%, var(--gold-deep) 100%);
+    box-shadow: 0 0 8px var(--gold);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+  }
+
+  /* ---------- Wheel ---------- */
+  .wheel-wrap{
+    position:relative;
+    width: min(400px, 86vw);
+    height: min(400px, 86vw);
+    margin: 6px 0 30px;
+    filter: drop-shadow(0 0 30px rgba(255,46,196,0.25));
+  }
+  .pointer{
+    position:absolute;
+    top:-14px; left:50%;
+    transform: translateX(-50%);
+    width:0; height:0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 24px solid var(--cyan);
+    filter: drop-shadow(0 0 8px var(--cyan));
+    z-index: 5;
+  }
+  .wheel{
+    width:100%; height:100%;
+    border-radius:50%;
+    position:relative;
+    border: 6px solid #1c1233;
+    box-shadow:
+      0 0 0 3px rgba(255,46,196,0.5),
+      0 0 40px rgba(32,230,255,0.25),
+      inset 0 0 30px rgba(0,0,0,0.6);
+    transition: transform 4.5s cubic-bezier(0.14, 0.83, 0.09, 1);
+    will-change: transform;
+  }
+  .sector-label{
+    position:absolute;
+    top:50%; left:50%;
+    width: 0; height: 0;
+    pointer-events:none;
+  }
+  .sector-label span{
+    position:absolute;
+    display:inline-block;
+    font-family:'Orbitron', sans-serif;
+    font-weight:700;
+    font-size: clamp(18px, 5.2vw, 22px);
+    white-space:nowrap;
+    left:50%; top:50%;
+  }
+  .sector-label.win span{
+    color:#3a2b00;
+    text-shadow: 0 0 6px rgba(255,255,255,0.6);
+  }
+  .sector-label.lose span{
+    color: rgba(255,255,255,0.75);
+  }
+  .hub{
+    position:absolute;
+    top:50%; left:50%;
+    width: 22%; height:22%;
+    transform: translate(-50%,-50%);
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #241a3d, #0a0616 75%);
+    border: 2px solid var(--magenta);
+    box-shadow: 0 0 16px var(--magenta), inset 0 0 10px rgba(0,0,0,0.7);
+    z-index:4;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .hub-mark{
+    font-family:'Orbitron', sans-serif;
+    font-size: 15px;
+    letter-spacing:1px;
+    color: var(--cyan);
+    text-shadow: 0 0 6px var(--cyan);
+  }
+
+  /* ---------- Result banner ---------- */
+  .result-line{
+    min-height: 26px;
+    font-family:'Orbitron', sans-serif;
+    font-size: 15px;
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+    text-align:center;
+  }
+  .result-line.win{ color: var(--gold); text-shadow:0 0 10px var(--gold); }
+  .result-line.lose{ color: var(--lose-red); text-shadow:0 0 8px var(--lose-red); }
+
+  /* ---------- Controls ---------- */
+  .controls{
+    width: 100%;
+    max-width: 440px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap: 16px;
+  }
+  .bet-label{
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+  }
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap: 8px;
+  }
+  .chip{
+    font-family:'Orbitron', sans-serif;
+    font-weight:700;
+    font-size: 15px;
+    width: 60px; height:60px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #2c1f4d, #150c2a 75%);
+    border: 2px dashed rgba(32,230,255,0.5);
+    color: #dcd6ff;
+    cursor:pointer;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  }
+  .chip:hover{ transform: translateY(-2px); }
+  .chip.selected{
+    border: 2px solid var(--gold);
+    border-style: solid;
+    box-shadow: 0 0 14px var(--gold);
+    color: var(--gold);
+  }
+  .chip:disabled{ opacity:0.35; cursor:not-allowed; transform:none; }
+
+  .spin-btn{
+    font-family:'Orbitron', sans-serif;
+    font-weight:900;
+    font-size: 19px;
+    letter-spacing: 2px;
+    padding: 16px 52px;
+    border-radius: 40px;
+    border: none;
+    cursor:pointer;
+    color: #1a0a1e;
+    background: linear-gradient(90deg, var(--cyan), var(--magenta));
+    box-shadow: 0 0 22px rgba(255,46,196,0.5), 0 0 22px rgba(32,230,255,0.35);
+    transition: transform .12s ease, filter .12s ease;
+  }
+  .spin-btn:hover{ transform: translateY(-2px); filter:brightness(1.08); }
+  .spin-btn:disabled{
+    background: #2a2440;
+    color: #6a6285;
+    box-shadow:none;
+    cursor:not-allowed;
+    transform:none;
+  }
+
+  .odds-note{
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    text-align:center;
+    max-width: 320px;
+  }
+
+  /* ---------- Game over overlay ---------- */
+  .overlay{
+    position:fixed; inset:0;
+    background: rgba(4,2,10,0.88);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+    gap: 18px;
+    z-index: 50;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .3s ease;
+  }
+  .overlay.show{ opacity:1; pointer-events:auto; }
+  .overlay h2{
+    font-family:'Orbitron', sans-serif;
+    color: var(--lose-red);
+    text-shadow: 0 0 16px var(--lose-red);
+    font-size: 26px;
+    letter-spacing:2px;
+    margin:0;
+  }
+  .overlay p{ color: var(--text-dim); margin:0; text-align:center; max-width:280px; }
+  .restart-btn{
+    font-family:'Orbitron', sans-serif;
+    font-weight:900;
+    font-size: 15px;
+    letter-spacing: 1.5px;
+    padding: 13px 34px;
+    border-radius: 40px;
+    border: 2px solid var(--gold);
+    cursor:pointer;
+    color: var(--gold);
+    background: rgba(255,210,63,0.08);
+    box-shadow: 0 0 18px rgba(255,210,63,0.35);
+  }
+  .restart-btn:hover{ background: rgba(255,210,63,0.18); }
+
+  /* ---------- Coin rain ---------- */
+  .coin-layer{
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index: 40;
+    overflow:hidden;
+  }
+  .coin{
+    position:absolute;
+    top:-60px;
+    width: 30px; height:30px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #fff8dc, var(--gold) 55%, var(--gold-deep) 100%);
+    box-shadow: 0 0 10px rgba(255,210,63,0.8), inset 0 0 4px rgba(255,255,255,0.6);
+    display:flex; align-items:center; justify-content:center;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+  }
+  .coin svg{
+    width: 62%; height:62%;
+    filter: drop-shadow(0 0 1px rgba(120,84,0,0.9));
+  }
+  @keyframes fall{
+    0%{ transform: translateY(0) rotate(0deg); opacity:1; }
+    100%{ transform: translateY(110vh) rotate(540deg); opacity:0.9; }
+  }
+
+  @media (max-width: 380px){
+    .chip{ width:52px; height:52px; font-size:13px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .wheel{ transition: transform 0.6s linear; }
+    .coin{ animation-duration: 0.6s !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <h1 class="marquee">NEON FORTUNE</h1>
+  <div class="subtitle">КОЛЕСО УДАЧИ · 12 СЕКТОРОВ</div>
+
+  <div class="balance-panel">
+    <span class="crip-icon">₡</span>
+    <div>
+      <div class="balance-label">БАЛАНС</div>
+      <div class="balance-value" id="balanceValue">100</div>
+    </div>
+  </div>
+
+  <div class="wheel-wrap">
+    <div class="pointer"></div>
+    <div class="wheel" id="wheel">
+      <div class="hub"><span class="hub-mark">×5</span></div>
+    </div>
+  </div>
+
+  <div class="result-line" id="resultLine"></div>
+
+  <div class="controls">
+    <div class="bet-label">РАЗМЕР СТАВКИ (КРИПИКИ)</div>
+    <div class="chips" id="chipRow"></div>
+    <button class="spin-btn" id="spinBtn">КРУТИТЬ</button>
+    <div class="odds-note">Шанс на выигрыш ~5%. При победе ставка возвращается ×5.</div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <h2>БАЛАНС ОБНУЛЁН</h2>
+  <p>Крипики закончились. Начните заново — casino дарит новую сотню на удачу.</p>
+  <button class="restart-btn" id="restartBtn">НАЧАТЬ ЗАНОВО</button>
+</div>
+
+<div class="coin-layer" id="coinLayer"></div>
+
+<script>
+(function(){
+  // ---- config ----
+  const SECTORS = 12;
+  const SECTOR_ANGLE = 360 / SECTORS;
+  const WIN_INDICES = [2, 8]; // two opposite winning sectors
+  const WIN_PROBABILITY = 0.05;
+  const BET_STEPS = [10,20,30,40,50,60,70,80,90,100];
+  const START_BALANCE = 100;
+  const WIN_MULTIPLIER = 5;
+
+  // ---- state ----
+  let balance = START_BALANCE;
+  let selectedBet = 10;
+  let spinning = false;
+  let currentRotation = 0;
+
+  // ---- elements ----
+  const wheelEl = document.getElementById('wheel');
+  const balanceEl = document.getElementById('balanceValue');
+  const resultEl = document.getElementById('resultLine');
+  const chipRow = document.getElementById('chipRow');
+  const spinBtn = document.getElementById('spinBtn');
+  const overlay = document.getElementById('overlay');
+  const restartBtn = document.getElementById('restartBtn');
+  const coinLayer = document.getElementById('coinLayer');
+
+  // ---- build wheel visuals ----
+  const colors = [];
+  for(let i=0;i<SECTORS;i++){
+    colors.push(WIN_INDICES.includes(i) ? '#ffd23f' : (i % 2 === 0 ? '#3a2166' : '#170c2a'));
+  }
+  let gradientParts = [];
+  for(let i=0;i<SECTORS;i++){
+    const start = i*SECTOR_ANGLE;
+    const end = start+SECTOR_ANGLE;
+    gradientParts.push(`${colors[i]} ${start}deg ${end}deg`);
+  }
+  wheelEl.style.background = `conic-gradient(from 0deg, ${gradientParts.join(', ')})`;
+
+  const dividerLayer = document.createElement('div');
+  dividerLayer.style.position = 'absolute';
+  dividerLayer.style.inset = '0';
+  dividerLayer.style.pointerEvents = 'none';
+  for(let i=0;i<SECTORS;i++){
+    const boundaryAngle = i*SECTOR_ANGLE;
+    const line = document.createElement('div');
+    line.style.position = 'absolute';
+    line.style.top = '50%';
+    line.style.left = '50%';
+    line.style.width = '1px';
+    line.style.height = '50%';
+    line.style.background = 'rgba(32,230,255,0.28)';
+    line.style.transformOrigin = 'top center';
+    line.style.transform = `rotate(${boundaryAngle}deg)`;
+    dividerLayer.appendChild(line);
+  }
+  wheelEl.appendChild(dividerLayer);
+
+  function positionLabels(){
+    const radius = wheelEl.clientWidth / 2;
+    const iconRadius = radius * 0.76;
+    document.querySelectorAll('.sector-label span').forEach(span => {
+      const angle = Number(span.dataset.angle);
+      span.style.transform = `translate(-50%, -50%) rotate(${angle}deg) translateY(-${iconRadius}px) rotate(${-angle}deg)`;
+    });
+  }
+
+  for(let i=0;i<SECTORS;i++){
+    const centerAngle = i*SECTOR_ANGLE + SECTOR_ANGLE/2;
+    const isWin = WIN_INDICES.includes(i);
+    const label = document.createElement('div');
+    label.className = 'sector-label ' + (isWin ? 'win' : 'lose');
+    const span = document.createElement('span');
+    span.dataset.angle = centerAngle;
+    span.textContent = isWin ? '$' : '☠';
+    label.appendChild(span);
+    wheelEl.appendChild(label);
+  }
+  positionLabels();
+  window.addEventListener('resize', positionLabels);
+
+  // ---- build chips ----
+  BET_STEPS.forEach(val => {
+    const btn = document.createElement('button');
+    btn.className = 'chip' + (val === selectedBet ? ' selected' : '');
+    btn.textContent = val;
+    btn.dataset.value = val;
+    btn.addEventListener('click', () => {
+      if(spinning) return;
+      selectedBet = val;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+      btn.classList.add('selected');
+      refreshSpinAvailability();
+    });
+    chipRow.appendChild(btn);
+  });
+
+  function refreshSpinAvailability(){
+    const chips = document.querySelectorAll('.chip');
+    chips.forEach(c => {
+      const val = Number(c.dataset.value);
+      c.disabled = spinning || val > balance;
+    });
+    spinBtn.disabled = spinning || balance < selectedBet || balance <= 0;
+  }
+
+  function updateBalanceDisplay(){
+    balanceEl.textContent = balance;
+  }
+
+  function pickResultIndex(){
+    const isWin = Math.random() < WIN_PROBABILITY;
+    if(isWin){
+      return WIN_INDICES[Math.floor(Math.random()*WIN_INDICES.length)];
+    }
+    const loseIndices = [];
+    for(let i=0;i<SECTORS;i++){ if(!WIN_INDICES.includes(i)) loseIndices.push(i); }
+    return loseIndices[Math.floor(Math.random()*loseIndices.length)];
+  }
+
+  function spin(){
+    if(spinning) return;
+    if(balance < selectedBet) return;
+    spinning = true;
+    resultEl.textContent = '';
+    resultEl.className = 'result-line';
+    spinBtn.disabled = true;
+    document.querySelectorAll('.chip').forEach(c => c.disabled = true);
+
+    balance -= selectedBet;
+    updateBalanceDisplay();
+
+    const targetIndex = pickResultIndex();
+    const isWin = WIN_INDICES.includes(targetIndex);
+    const sectorCenter = targetIndex*SECTOR_ANGLE + SECTOR_ANGLE/2;
+    const jitter = (Math.random()*0.6 - 0.3) * (SECTOR_ANGLE*0.4);
+    const targetAngleWithinCircle = ((360 - sectorCenter) + 360) % 360;
+
+    const extraSpins = 5 + Math.floor(Math.random()*2); // 5-6 full turns
+    const currentMod = ((currentRotation % 360) + 360) % 360;
+    let delta = targetAngleWithinCircle - currentMod;
+    delta = ((delta % 360) + 360) % 360;
+
+    currentRotation += extraSpins*360 + delta + jitter;
+    wheelEl.style.transform = `rotate(${currentRotation}deg)`;
+
+    setTimeout(() => {
+      spinning = false;
+      if(isWin){
+        const prize = selectedBet * WIN_MULTIPLIER;
+        balance += prize;
+        updateBalanceDisplay();
+        resultEl.textContent = `ПРИЗ! +${prize} КРИПИКОВ`;
+        resultEl.className = 'result-line win';
+        launchCoinRain();
+      } else {
+        resultEl.textContent = 'МИМО. ПОПРОБУЙТЕ ЕЩЁ';
+        resultEl.className = 'result-line lose';
+      }
+
+      if(balance <= 0){
+        balance = 0;
+        updateBalanceDisplay();
+        setTimeout(() => overlay.classList.add('show'), 500);
+      }
+      refreshSpinAvailability();
+    }, 4600);
+  }
+
+  const CLOVER_SVG = `
+    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <g fill="#7a5200" fill-opacity="0.85">
+        <circle cx="16" cy="10" r="6"/>
+        <circle cx="10" cy="16" r="6"/>
+        <circle cx="22" cy="16" r="6"/>
+        <circle cx="16" cy="22" r="6"/>
+        <rect x="14.5" y="16" width="3" height="10" rx="1.4"/>
+      </g>
+    </svg>`;
+
+  function launchCoinRain(){
+    const count = 46;
+    for(let i=0;i<count;i++){
+      const coin = document.createElement('div');
+      coin.className = 'coin';
+      coin.innerHTML = CLOVER_SVG;
+      const left = Math.random()*100;
+      const duration = 2.6 + Math.random()*1.6;
+      const delay = Math.random()*0.6;
+      const size = 22 + Math.random()*14;
+      coin.style.left = left + 'vw';
+      coin.style.width = size+'px';
+      coin.style.height = size+'px';
+      coin.style.animationDuration = duration+'s';
+      coin.style.animationDelay = delay+'s';
+      coinLayer.appendChild(coin);
+      setTimeout(() => coin.remove(), (duration+delay)*1000 + 200);
+    }
+  }
+
+  function restartGame(){
+    balance = START_BALANCE;
+    updateBalanceDisplay();
+    resultEl.textContent = '';
+    resultEl.className = 'result-line';
+    overlay.classList.remove('show');
+    refreshSpinAvailability();
+  }
+
+  spinBtn.addEventListener('click', spin);
+  restartBtn.addEventListener('click', restartGame);
+
+  updateBalanceDisplay();
+  refreshSpinAvailability();
+})();
+</script>
+
+</body>
+</html>
