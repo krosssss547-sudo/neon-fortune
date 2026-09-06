@@ -35,6 +35,7 @@
     align-items:center;
     padding: 28px 16px 60px;
     position:relative;
+    z-index: 2;
   }
 
   /* ---------- Title ---------- */
@@ -59,7 +60,15 @@
     text-align:center;
   }
 
-  /* ---------- Balance readout ---------- */
+  /* ---------- Top bar: balance / mute / shop ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap: 10px;
+    margin-bottom: 26px;
+  }
   .balance-panel{
     display:flex;
     align-items:center;
@@ -69,7 +78,6 @@
     border-radius: 14px;
     padding: 10px 22px;
     box-shadow: 0 0 20px rgba(32,230,255,0.15), inset 0 0 12px rgba(32,230,255,0.08);
-    margin-bottom: 26px;
   }
   .balance-label{
     font-size: 11px;
@@ -82,7 +90,7 @@
     font-weight:700;
     color: var(--gold);
     text-shadow: 0 0 8px var(--gold), 0 0 20px rgba(255,210,63,0.6);
-    min-width: 100px;
+    min-width: 80px;
   }
   .crip-icon{
     width:30px; height:30px;
@@ -93,7 +101,36 @@
     align-items:center;
     justify-content:center;
     font-size:15px;
+    flex:0 0 auto;
   }
+  .icon-btn{
+    width:44px; height:44px;
+    border-radius:50%;
+    border: 1px solid rgba(32,230,255,0.35);
+    background: linear-gradient(180deg, #1a1030, #0c0818);
+    color: var(--cyan);
+    font-size: 18px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow: 0 0 12px rgba(32,230,255,0.15);
+    transition: transform .15s ease, box-shadow .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .icon-btn:hover{ transform: translateY(-2px); }
+  .icon-btn.muted{ color: var(--lose-red); border-color: rgba(255,56,96,0.5); }
+  .shop-open-btn{
+    font-family:'Orbitron', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 12px 20px;
+    border-radius: 22px;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    background: rgba(255,210,63,0.08);
+    cursor:pointer;
+    box-shadow: 0 0 10px rgba(255,210,63,0.25);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .shop-open-btn:hover{ transform: translateY(-2px); box-shadow: 0 0 16px rgba(255,210,63,0.4); }
 
   /* ---------- Wheel ---------- */
   .wheel-wrap{
@@ -194,6 +231,60 @@
     letter-spacing: 2px;
     color: var(--text-dim);
   }
+
+  /* ---------- Custom bet input flanked by coins/bills ---------- */
+  .bet-input-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 10px;
+  }
+  .bet-deco{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap: 4px;
+  }
+  .deco-coin{
+    width:16px; height:16px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #fff6cf, var(--gold) 55%, var(--gold-deep) 100%);
+    box-shadow: 0 0 6px var(--gold);
+  }
+  .deco-bill{
+    width:26px; height:15px;
+    border-radius:3px;
+    background: linear-gradient(135deg,#2f5d3a,#1d3823);
+    border:1px solid rgba(255,210,63,0.6);
+    position:relative;
+  }
+  .deco-bill::after{
+    content:'';
+    position:absolute; inset:2.5px;
+    border:1px dashed rgba(255,210,63,0.5);
+    border-radius:2px;
+  }
+  .bet-input{
+    width: 120px;
+    text-align:center;
+    font-family:'Orbitron', sans-serif;
+    font-size: 20px;
+    font-weight:700;
+    color: var(--gold);
+    background: linear-gradient(180deg, #1a1030, #0c0818);
+    border: 2px solid rgba(255,210,63,0.5);
+    border-radius: 12px;
+    padding: 10px 6px;
+    box-shadow: inset 0 0 10px rgba(255,210,63,0.15);
+  }
+  .bet-input:focus{ outline:none; border-color: var(--gold); box-shadow: 0 0 12px var(--gold); }
+  .bet-input:disabled{ opacity:0.5; }
+  .bet-hint{
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+
   .chips{
     display:flex;
     flex-wrap:wrap;
@@ -255,14 +346,17 @@
   /* ---------- Game over overlay ---------- */
   .overlay{
     position:fixed; inset:0;
-    background: rgba(4,2,10,0.88);
+    background: rgba(4,2,10,0.92);
     display:flex; align-items:center; justify-content:center;
     flex-direction:column;
-    gap: 18px;
+    gap: 14px;
     z-index: 50;
     opacity:0;
     pointer-events:none;
     transition: opacity .3s ease;
+    padding: 20px;
+    overflow-y:auto;
+    text-align:center;
   }
   .overlay.show{ opacity:1; pointer-events:auto; }
   .overlay h2{
@@ -273,7 +367,7 @@
     letter-spacing:2px;
     margin:0;
   }
-  .overlay p{ color: var(--text-dim); margin:0; text-align:center; max-width:280px; }
+  .overlay p{ color: var(--text-dim); margin:0; text-align:center; max-width:320px; }
   .restart-btn{
     font-family:'Orbitron', sans-serif;
     font-weight:900;
@@ -288,6 +382,303 @@
     box-shadow: 0 0 18px rgba(255,210,63,0.35);
   }
   .restart-btn:hover{ background: rgba(255,210,63,0.18); }
+
+  .mg-section-title{
+    font-family:'Orbitron', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    color: var(--cyan);
+    margin-top: 6px;
+  }
+  .mg-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-width: 340px;
+  }
+  .mg-card{
+    background: rgba(32,230,255,0.06);
+    border: 1px solid rgba(32,230,255,0.3);
+    border-radius: 12px;
+    padding: 12px 6px;
+    color: #f1edff;
+    font-size: 11px;
+    cursor:pointer;
+    text-align:center;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .mg-card:hover{ border-color: var(--cyan); box-shadow: 0 0 10px rgba(32,230,255,0.3); }
+  .mg-reward{
+    display:block;
+    color: var(--gold);
+    font-family:'Orbitron', sans-serif;
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  /* ---------- Generic modal (shop / mini-game) ---------- */
+  .modal{
+    position:fixed; inset:0;
+    background: rgba(4,2,10,0.9);
+    display:flex; align-items:center; justify-content:center;
+    z-index: 70;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .25s ease;
+    padding: 16px;
+  }
+  .modal.show{ opacity:1; pointer-events:auto; }
+  .modal-box{
+    background: linear-gradient(180deg, #1a1030, #0c0818);
+    border: 1px solid rgba(32,230,255,0.4);
+    border-radius: 18px;
+    padding: 18px;
+    max-width: 540px;
+    width: 100%;
+    max-height: 86vh;
+    overflow-y:auto;
+    box-shadow: 0 0 30px rgba(32,230,255,0.2);
+  }
+  .modal-header{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 14px;
+  }
+  .modal-header h3{
+    font-family:'Orbitron', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: #fff;
+    margin:0;
+  }
+  .modal-close{
+    background:none; border:none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor:pointer;
+    line-height:1;
+  }
+  .modal-close:hover{ color:#fff; }
+
+  /* ---- shop ---- */
+  .shop-balance{
+    text-align:center;
+    margin-bottom: 14px;
+    font-family:'Orbitron', sans-serif;
+    color: var(--gold);
+    font-size: 14px;
+  }
+  .shop-tabs{ display:flex; gap:8px; margin-bottom: 14px; }
+  .shop-tab{
+    flex:1;
+    padding: 9px;
+    border-radius: 10px;
+    border: 1px solid rgba(32,230,255,0.3);
+    background:transparent;
+    color: var(--text-dim);
+    font-family:'Orbitron', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    cursor:pointer;
+  }
+  .shop-tab.active{ border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 10px rgba(32,230,255,0.3); }
+  .shop-slot{ margin-bottom: 16px; }
+  .shop-slot-title{ font-size: 11px; letter-spacing: 1.5px; color: var(--text-dim); margin-bottom: 6px; }
+  .shop-items{ display:flex; flex-wrap:wrap; gap: 8px; }
+  .shop-item{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    width: 92px;
+    padding: 8px 6px;
+    border-radius: 10px;
+    border: 1px solid rgba(32,230,255,0.25);
+    background: rgba(255,255,255,0.02);
+    font-size: 11px;
+    text-align:center;
+  }
+  .shop-item .item-name{ color:#f1edff; min-height: 26px; }
+  .shop-item .item-price{ color: var(--gold); font-family:'Orbitron', sans-serif; font-size: 12px; }
+  .shop-item button{
+    font-family:'Orbitron', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    padding: 6px 8px;
+    border-radius: 14px;
+    border:none;
+    cursor:pointer;
+    margin-top:2px;
+    width:100%;
+  }
+  .shop-item button.buy{ background: linear-gradient(90deg, var(--cyan), var(--magenta)); color:#1a0a1e; }
+  .shop-item button.equip{ background: rgba(32,230,255,0.15); color: var(--cyan); border: 1px solid var(--cyan); }
+  .shop-item button.equipped{ background: rgba(255,210,63,0.2); color: var(--gold); border: 1px solid var(--gold); }
+  .shop-item button:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  /* ---- mini-game modal body ---- */
+  .mg-body{ display:flex; flex-direction:column; align-items:center; gap:14px; padding: 4px 0; }
+  .mg-btn{
+    font-family:'Orbitron', sans-serif;
+    font-weight:700;
+    padding: 14px 28px;
+    border-radius: 14px;
+    border: 2px solid var(--cyan);
+    background: rgba(32,230,255,0.08);
+    color: var(--cyan);
+    cursor:pointer;
+    font-size: 14px;
+  }
+  .mg-btn:hover{ box-shadow: 0 0 14px var(--cyan); }
+  .mg-btn.go{ border-color: var(--gold); color: var(--gold); background: rgba(255,210,63,0.1); }
+  .mg-status{ min-height:20px; font-size:13px; text-align:center; color: var(--text-dim); }
+  .mg-tiles{ display:grid; grid-template-columns: repeat(2, 70px); gap:10px; }
+  .mg-tile{ width:70px; height:70px; border-radius:10px; cursor:pointer; opacity:0.45; transition: opacity .15s ease, transform .1s ease; border:none; }
+  .mg-tile.flash{ opacity:1; transform:scale(1.05); }
+  .mg-choices{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .mg-choice-btn{
+    font-family:'Orbitron', sans-serif;
+    font-size: 13px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(32,230,255,0.4);
+    background: rgba(255,255,255,0.03);
+    color:#f1edff;
+    cursor:pointer;
+  }
+  .mg-choice-btn:hover{ border-color: var(--cyan); }
+  .mg-catch-area{
+    position:relative;
+    width:100%; max-width:280px; height:180px;
+    border: 1px dashed rgba(32,230,255,0.3);
+    border-radius: 12px;
+    overflow:hidden;
+  }
+  .mg-coin-target{
+    width:52px; height:52px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #fff6cf, var(--gold) 55%, var(--gold-deep) 100%);
+    box-shadow: 0 0 12px var(--gold);
+    position:absolute;
+    border:none;
+    cursor:pointer;
+    transition: left .28s linear, top .28s linear;
+  }
+
+  /* ---------- Neon skeletons (side guards) ---------- */
+  .skeleton-side{
+    position: fixed;
+    bottom: 0;
+    width: clamp(52px, 9vw, 150px);
+    aspect-ratio: 120 / 480;
+    z-index: 1;
+    pointer-events: none;
+    transform-origin: bottom center;
+    animation: skeleSway 6.5s ease-in-out infinite alternate;
+  }
+  .skeleton-left{ left: 0; animation-delay: 0s; }
+  .skeleton-right{ right: 0; animation-delay: -3.2s; }
+  @keyframes skeleSway{
+    0%{ transform: rotate(-0.6deg); }
+    100%{ transform: rotate(0.6deg); }
+  }
+  .skele-svg{
+    display:block;
+    width:100%;
+    height:100%;
+    filter:
+      drop-shadow(0 0 3px var(--cyan))
+      drop-shadow(0 0 9px rgba(32,230,255,0.55))
+      drop-shadow(0 0 14px rgba(255,46,196,0.25));
+  }
+  .skele-svg .jaw{
+    transition: transform .35s cubic-bezier(.34,1.2,.64,1);
+    transform-box: fill-box;
+    transform-origin: center top;
+  }
+  .skeleton-side.jaw-open .jaw{
+    transform: translateY(7px) rotate(5deg);
+  }
+  .skeleton-right.jaw-open .jaw{
+    transform: translateY(7px) rotate(-5deg);
+  }
+  .skele-bubble{
+    position:absolute;
+    top: 6%;
+    width: max-content;
+    max-width: 130px;
+    background: linear-gradient(180deg, #1a1030, #0c0818);
+    border: 1px solid var(--cyan);
+    border-radius: 12px;
+    padding: 7px 10px;
+    font-size: 11px;
+    line-height:1.3;
+    color:#f1edff;
+    text-align:center;
+    opacity:0;
+    transform: translateY(6px) scale(0.9);
+    transition: opacity .3s ease, transform .3s ease;
+    box-shadow: 0 0 14px rgba(32,230,255,0.4);
+  }
+  .skeleton-left .skele-bubble{ left: 100%; margin-left:6px; }
+  .skeleton-right .skele-bubble{ right:100%; margin-right:6px; }
+  .skele-bubble.show{ opacity:1; transform:translateY(0) scale(1); }
+
+  @media (max-width: 560px){
+    .skeleton-side{ width: clamp(36px, 8vw, 82px); }
+    .skele-bubble{ max-width: 100px; font-size: 9.5px; padding:5px 7px; }
+  }
+  @media (max-width: 380px){
+    .skeleton-side{ width: clamp(28px, 7vw, 60px); opacity: 0.85; }
+    .chip{ width:52px; height:52px; font-size:13px; }
+  }
+
+  /* ---------- Yakubovich banner ---------- */
+  .yak-banner{
+    position: fixed;
+    left: 50%;
+    top: 14%;
+    transform: translate(-50%, -20px);
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    background: linear-gradient(180deg, #241a3d, #150c2a);
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 14px 22px;
+    box-shadow: 0 0 26px rgba(255,210,63,0.55), inset 0 0 14px rgba(255,210,63,0.12);
+    z-index: 60;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .35s ease, transform .35s ease;
+    max-width: 90vw;
+  }
+  .yak-banner.show{
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  .yak-avatar{
+    width: 46px; height:46px;
+    flex: 0 0 auto;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #3a2b00, var(--gold-deep) 70%);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 22px;
+    box-shadow: 0 0 10px var(--gold);
+  }
+  .yak-text{
+    display:flex;
+    flex-direction:column;
+    gap: 2px;
+  }
+  .yak-name{
+    font-family:'Orbitron', sans-serif;
+    font-weight:900;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    color: var(--gold);
+    text-shadow: 0 0 8px var(--gold);
+  }
+  .yak-phrase{
+    font-size: 14px;
+    color: #f1edff;
+    letter-spacing: 0.3px;
+  }
 
   /* ---------- Coin rain ---------- */
   .coin-layer{
@@ -310,35 +701,39 @@
   }
   .coin svg{
     width: 62%; height:62%;
-    filter: drop-shadow(0 0 1px rgba(120,84,0,0.9));
+    filter: drop-shadow(0 0 1px rgba(0,0,0,0.9));
   }
   @keyframes fall{
     0%{ transform: translateY(0) rotate(0deg); opacity:1; }
     100%{ transform: translateY(110vh) rotate(540deg); opacity:0.9; }
   }
 
-  @media (max-width: 380px){
-    .chip{ width:52px; height:52px; font-size:13px; }
-  }
-
   @media (prefers-reduced-motion: reduce){
     .wheel{ transition: transform 0.6s linear; }
     .coin{ animation-duration: 0.6s !important; }
+    .skeleton-side{ animation: none; }
   }
 </style>
 </head>
 <body>
 
+<div class="skeleton-side skeleton-left" id="skeletonLeft"></div>
+<div class="skeleton-side skeleton-right" id="skeletonRight"></div>
+
 <div class="stage">
   <h1 class="marquee">NEON FORTUNE</h1>
   <div class="subtitle">КОЛЕСО УДАЧИ · 12 СЕКТОРОВ</div>
 
-  <div class="balance-panel">
-    <span class="crip-icon">₡</span>
-    <div>
-      <div class="balance-label">БАЛАНС</div>
-      <div class="balance-value" id="balanceValue">100</div>
+  <div class="topbar">
+    <div class="balance-panel">
+      <span class="crip-icon">₡</span>
+      <div>
+        <div class="balance-label">БАЛАНС</div>
+        <div class="balance-value" id="balanceValue">100</div>
+      </div>
     </div>
+    <button class="icon-btn" id="muteBtn" title="Выключить звук">🔊</button>
+    <button class="shop-open-btn" id="shopOpenBtn">🛍 МАГАЗИН</button>
   </div>
 
   <div class="wheel-wrap">
@@ -352,6 +747,22 @@
 
   <div class="controls">
     <div class="bet-label">РАЗМЕР СТАВКИ (КРИПИКИ)</div>
+
+    <div class="bet-input-row">
+      <div class="bet-deco">
+        <div class="deco-coin"></div>
+        <div class="deco-bill"></div>
+        <div class="deco-coin"></div>
+      </div>
+      <input type="number" class="bet-input" id="betInput" min="1" max="1000" value="10">
+      <div class="bet-deco">
+        <div class="deco-coin"></div>
+        <div class="deco-bill"></div>
+        <div class="deco-coin"></div>
+      </div>
+    </div>
+    <div class="bet-hint">Своя ставка от 1 до 1000 крипиков</div>
+
     <div class="chips" id="chipRow"></div>
     <button class="spin-btn" id="spinBtn">КРУТИТЬ</button>
     <div class="odds-note">Шанс на выигрыш ~5%. При победе ставка возвращается ×5.</div>
@@ -360,40 +771,95 @@
 
 <div class="overlay" id="overlay">
   <h2>БАЛАНС ОБНУЛЁН</h2>
-  <p>Крипики закончились. Начните заново — casino дарит новую сотню на удачу.</p>
+  <p>Крипики закончились. Начните заново — casino дарит новую сотню на удачу, либо заработайте немного в мини-играх.</p>
   <button class="restart-btn" id="restartBtn">НАЧАТЬ ЗАНОВО</button>
+  <div class="mg-section-title">МИНИ-ИГРЫ · +10 КРИПИКОВ ЗА ПОБЕДУ</div>
+  <div class="mg-grid" id="mgGrid"></div>
+</div>
+
+<div class="modal" id="mgModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="mgTitle">Мини-игра</h3>
+      <button class="modal-close" id="mgClose">✕</button>
+    </div>
+    <div class="mg-body" id="mgBody"></div>
+  </div>
+</div>
+
+<div class="modal" id="shopModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>МАГАЗИН ОДЕЖДЫ</h3>
+      <button class="modal-close" id="shopClose">✕</button>
+    </div>
+    <div class="shop-balance">Баланс: <span id="shopBalanceValue">100</span> ₡</div>
+    <div class="shop-tabs">
+      <button class="shop-tab active" id="shopTabLeft">ЛЕВЫЙ СКЕЛЕТ</button>
+      <button class="shop-tab" id="shopTabRight">ПРАВЫЙ СКЕЛЕТ</button>
+    </div>
+    <div id="shopItemsContainer"></div>
+  </div>
 </div>
 
 <div class="coin-layer" id="coinLayer"></div>
 
+<div class="yak-banner" id="yakBanner">
+  <div class="yak-avatar">🎩</div>
+  <div class="yak-text">
+    <div class="yak-name">ЯКУБОВИЧ</div>
+    <div class="yak-phrase">«Сектор приз на барабане!»</div>
+  </div>
+</div>
+
 <script>
 (function(){
-  // ---- config ----
+  // ================== CONFIG ==================
   const SECTORS = 12;
   const SECTOR_ANGLE = 360 / SECTORS;
-  const WIN_INDICES = [2, 8]; // two opposite winning sectors
+  const WIN_INDICES = [2, 8];
   const WIN_PROBABILITY = 0.05;
   const BET_STEPS = [10,20,30,40,50,60,70,80,90,100];
   const START_BALANCE = 100;
   const WIN_MULTIPLIER = 5;
+  const MIN_BET = 1;
+  const MAX_BET = 1000;
 
-  // ---- state ----
+  // ================== STATE ==================
   let balance = START_BALANCE;
   let selectedBet = 10;
   let spinning = false;
   let currentRotation = 0;
+  let muted = false;
 
-  // ---- elements ----
+  // ================== ELEMENTS ==================
   const wheelEl = document.getElementById('wheel');
   const balanceEl = document.getElementById('balanceValue');
   const resultEl = document.getElementById('resultLine');
   const chipRow = document.getElementById('chipRow');
+  const betInput = document.getElementById('betInput');
   const spinBtn = document.getElementById('spinBtn');
   const overlay = document.getElementById('overlay');
   const restartBtn = document.getElementById('restartBtn');
   const coinLayer = document.getElementById('coinLayer');
+  const yakBanner = document.getElementById('yakBanner');
+  const muteBtn = document.getElementById('muteBtn');
+  const skeletonLeft = document.getElementById('skeletonLeft');
+  const skeletonRight = document.getElementById('skeletonRight');
+  const shopOpenBtn = document.getElementById('shopOpenBtn');
+  const shopModal = document.getElementById('shopModal');
+  const shopClose = document.getElementById('shopClose');
+  const shopBalanceValue = document.getElementById('shopBalanceValue');
+  const shopTabLeft = document.getElementById('shopTabLeft');
+  const shopTabRight = document.getElementById('shopTabRight');
+  const shopItemsContainer = document.getElementById('shopItemsContainer');
+  const mgGrid = document.getElementById('mgGrid');
+  const mgModal = document.getElementById('mgModal');
+  const mgClose = document.getElementById('mgClose');
+  const mgTitle = document.getElementById('mgTitle');
+  const mgBody = document.getElementById('mgBody');
 
-  // ---- build wheel visuals ----
+  // ================== WHEEL VISUALS ==================
   const colors = [];
   for(let i=0;i<SECTORS;i++){
     colors.push(WIN_INDICES.includes(i) ? '#ffd23f' : (i % 2 === 0 ? '#3a2166' : '#170c2a'));
@@ -448,7 +914,7 @@
   positionLabels();
   window.addEventListener('resize', positionLabels);
 
-  // ---- build chips ----
+  // ================== CHIPS + BET INPUT ==================
   BET_STEPS.forEach(val => {
     const btn = document.createElement('button');
     btn.className = 'chip' + (val === selectedBet ? ' selected' : '');
@@ -457,12 +923,30 @@
     btn.addEventListener('click', () => {
       if(spinning) return;
       selectedBet = val;
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-      btn.classList.add('selected');
+      betInput.value = val;
+      syncChipHighlight();
       refreshSpinAvailability();
     });
     chipRow.appendChild(btn);
   });
+
+  function syncChipHighlight(){
+    document.querySelectorAll('.chip').forEach(c => {
+      c.classList.toggle('selected', Number(c.dataset.value) === selectedBet);
+    });
+  }
+
+  function normalizeBetInput(){
+    let val = parseInt(betInput.value, 10);
+    if(isNaN(val)) val = MIN_BET;
+    val = Math.max(MIN_BET, Math.min(MAX_BET, val));
+    betInput.value = val;
+    selectedBet = val;
+    syncChipHighlight();
+    refreshSpinAvailability();
+  }
+  betInput.addEventListener('input', normalizeBetInput);
+  betInput.addEventListener('blur', normalizeBetInput);
 
   function refreshSpinAvailability(){
     const chips = document.querySelectorAll('.chip');
@@ -470,11 +954,13 @@
       const val = Number(c.dataset.value);
       c.disabled = spinning || val > balance;
     });
+    betInput.disabled = spinning;
     spinBtn.disabled = spinning || balance < selectedBet || balance <= 0;
   }
 
   function updateBalanceDisplay(){
     balanceEl.textContent = balance;
+    shopBalanceValue.textContent = balance;
   }
 
   function pickResultIndex(){
@@ -495,6 +981,7 @@
     resultEl.className = 'result-line';
     spinBtn.disabled = true;
     document.querySelectorAll('.chip').forEach(c => c.disabled = true);
+    betInput.disabled = true;
 
     balance -= selectedBet;
     updateBalanceDisplay();
@@ -505,7 +992,7 @@
     const jitter = (Math.random()*0.6 - 0.3) * (SECTOR_ANGLE*0.4);
     const targetAngleWithinCircle = ((360 - sectorCenter) + 360) % 360;
 
-    const extraSpins = 5 + Math.floor(Math.random()*2); // 5-6 full turns
+    const extraSpins = 5 + Math.floor(Math.random()*2);
     const currentMod = ((currentRotation % 360) + 360) % 360;
     let delta = targetAngleWithinCircle - currentMod;
     delta = ((delta % 360) + 360) % 360;
@@ -522,9 +1009,12 @@
         resultEl.textContent = `ПРИЗ! +${prize} КРИПИКОВ`;
         resultEl.className = 'result-line win';
         launchCoinRain();
+        showYakBanner();
+        openSkeletonJaws();
       } else {
         resultEl.textContent = 'МИМО. ПОПРОБУЙТЕ ЕЩЁ';
         resultEl.className = 'result-line lose';
+        tauntSkeletons();
       }
 
       if(balance <= 0){
@@ -536,14 +1026,14 @@
     }, 4600);
   }
 
+  // ================== COIN RAIN (black three-leaf clover) ==================
   const CLOVER_SVG = `
     <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-      <g fill="#7a5200" fill-opacity="0.85">
-        <circle cx="16" cy="10" r="6"/>
-        <circle cx="10" cy="16" r="6"/>
-        <circle cx="22" cy="16" r="6"/>
-        <circle cx="16" cy="22" r="6"/>
-        <rect x="14.5" y="16" width="3" height="10" rx="1.4"/>
+      <g fill="#0a0a0a" fill-opacity="0.9">
+        <circle cx="16" cy="11" r="6.4"/>
+        <circle cx="9" cy="19" r="6.4"/>
+        <circle cx="23" cy="19" r="6.4"/>
+        <rect x="14.6" y="18" width="2.8" height="11" rx="1.3"/>
       </g>
     </svg>`;
 
@@ -554,8 +1044,8 @@
       coin.className = 'coin';
       coin.innerHTML = CLOVER_SVG;
       const left = Math.random()*100;
-      const duration = 2.6 + Math.random()*1.6;
-      const delay = Math.random()*0.6;
+      const duration = 4.6 + Math.random()*1.6;
+      const delay = Math.random()*1.0;
       const size = 22 + Math.random()*14;
       coin.style.left = left + 'vw';
       coin.style.width = size+'px';
@@ -567,6 +1057,575 @@
     }
   }
 
+  // ================== YAKUBOVICH BANNER ==================
+  let yakTimeoutId = null;
+  function showYakBanner(){
+    if(yakTimeoutId) clearTimeout(yakTimeoutId);
+    yakBanner.classList.add('show');
+    yakTimeoutId = setTimeout(() => {
+      yakBanner.classList.remove('show');
+      yakTimeoutId = null;
+    }, 4200);
+  }
+
+  // ================== SKELETONS: BUILD (more realistic) ==================
+  function skeletonBonesSVG(){
+    return `
+      <g class="bones" fill="none" stroke="var(--cyan)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- cranium -->
+        <ellipse cx="60" cy="42" rx="23" ry="25" stroke-width="3.2"/>
+        <path d="M46 20 Q60 13 74 20" stroke-width="1.2" opacity="0.55"/>
+        <path d="M38 46 Q33 56 40 63" stroke-width="2"/>
+        <path d="M82 46 Q87 56 80 63" stroke-width="2"/>
+        <!-- eye sockets -->
+        <ellipse cx="50" cy="40" rx="7" ry="9" fill="var(--bg-0)" stroke-width="2"/>
+        <ellipse cx="70" cy="40" rx="7" ry="9" fill="var(--bg-0)" stroke-width="2"/>
+        <!-- nasal cavity -->
+        <path d="M60 44 L55 54 L65 54 Z" fill="var(--bg-0)" stroke-width="1.3"/>
+        <!-- cervical vertebrae -->
+        <circle cx="60" cy="72" r="2.4" fill="var(--cyan)" stroke="none"/>
+        <circle cx="60" cy="80" r="2.4" fill="var(--cyan)" stroke="none"/>
+        <!-- clavicles -->
+        <path d="M37 94 L60 86 L83 94" stroke-width="2.2"/>
+        <!-- spine + vertebra dots -->
+        <line x1="60" y1="86" x2="60" y2="176"/>
+        <circle cx="60" cy="98" r="2" fill="var(--cyan)" stroke="none"/>
+        <circle cx="60" cy="112" r="2" fill="var(--cyan)" stroke="none"/>
+        <circle cx="60" cy="126" r="2" fill="var(--cyan)" stroke="none"/>
+        <circle cx="60" cy="140" r="2" fill="var(--cyan)" stroke="none"/>
+        <circle cx="60" cy="154" r="2" fill="var(--cyan)" stroke="none"/>
+        <circle cx="60" cy="168" r="2" fill="var(--cyan)" stroke="none"/>
+        <!-- ribcage -->
+        <path d="M44 98 Q60 106 76 98" stroke-width="2"/>
+        <path d="M41 111 Q60 121 79 111" stroke-width="2"/>
+        <path d="M39 124 Q60 135 81 124" stroke-width="2"/>
+        <path d="M39 137 Q60 148 81 137" stroke-width="2"/>
+        <path d="M41 150 Q60 160 79 150" stroke-width="2"/>
+        <path d="M44 162 Q60 171 76 162" stroke-width="2"/>
+        <!-- pelvis -->
+        <path d="M40 176 Q60 166 80 176 L84 198 Q60 216 36 198 Z" stroke-width="2.4"/>
+        <!-- shoulder / elbow / wrist joints + arms -->
+        <circle cx="37" cy="94" r="3.6" fill="var(--bg-0)" stroke-width="2"/>
+        <circle cx="83" cy="94" r="3.6" fill="var(--bg-0)" stroke-width="2"/>
+        <path d="M37 97 L26 146" stroke-width="3"/>
+        <path d="M83 97 L94 146" stroke-width="3"/>
+        <circle cx="25" cy="149" r="3" fill="var(--bg-0)" stroke-width="1.8"/>
+        <circle cx="95" cy="149" r="3" fill="var(--bg-0)" stroke-width="1.8"/>
+        <path d="M25 152 L30 196" stroke-width="2.6"/>
+        <path d="M95 152 L90 196" stroke-width="2.6"/>
+        <circle cx="30" cy="199" r="2.6" fill="var(--bg-0)" stroke-width="1.6"/>
+        <circle cx="90" cy="199" r="2.6" fill="var(--bg-0)" stroke-width="1.6"/>
+        <path d="M26 202 L22 210 M30 203 L28 212 M34 202 L34 212" stroke-width="1.4"/>
+        <path d="M94 202 L98 210 M90 203 L92 212 M86 202 L86 212" stroke-width="1.4"/>
+        <!-- hip / knee / ankle joints + legs -->
+        <circle cx="48" cy="200" r="3.6" fill="var(--bg-0)" stroke-width="2"/>
+        <circle cx="72" cy="200" r="3.6" fill="var(--bg-0)" stroke-width="2"/>
+        <path d="M48 204 L44 300" stroke-width="3.2"/>
+        <path d="M72 204 L76 300" stroke-width="3.2"/>
+        <circle cx="44" cy="303" r="3.2" fill="var(--bg-0)" stroke-width="1.8"/>
+        <circle cx="76" cy="303" r="3.2" fill="var(--bg-0)" stroke-width="1.8"/>
+        <path d="M44 307 L40 396" stroke-width="2.8"/>
+        <path d="M76 307 L80 396" stroke-width="2.8"/>
+        <circle cx="40" cy="399" r="2.6" fill="var(--bg-0)" stroke-width="1.6"/>
+        <circle cx="80" cy="399" r="2.6" fill="var(--bg-0)" stroke-width="1.6"/>
+        <!-- feet -->
+        <path d="M40 401 L30 410 L52 410 Z" stroke-width="2"/>
+        <path d="M80 401 L90 410 L68 410 Z" stroke-width="2"/>
+      </g>
+      <g class="outfit"></g>
+      <g class="jaw">
+        <path d="M43 63 Q60 82 77 63 Q60 73 43 63 Z" fill="none" stroke="var(--cyan)" stroke-width="3.2" stroke-linejoin="round"/>
+        <path d="M49 67 L49 71 M55 70 L55 74 M60 71 L60 75 M65 70 L65 74 M71 67 L71 71" stroke-width="1.3"/>
+      </g>
+    `;
+  }
+
+  function buildSkeleton(container, bubbleId){
+    container.innerHTML = `
+      <svg class="skele-svg" viewBox="0 0 120 480" xmlns="http://www.w3.org/2000/svg">
+        ${skeletonBonesSVG()}
+      </svg>
+      <div class="skele-bubble" id="${bubbleId}">Крути ещё раз, братишь!</div>
+    `;
+  }
+  buildSkeleton(skeletonLeft, 'skeleBubbleLeft');
+  buildSkeleton(skeletonRight, 'skeleBubbleRight');
+  const skeleBubbleLeft = document.getElementById('skeleBubbleLeft');
+  const skeleBubbleRight = document.getElementById('skeleBubbleRight');
+
+  let jawTimeoutId = null;
+  function openSkeletonJaws(){
+    if(jawTimeoutId) clearTimeout(jawTimeoutId);
+    skeletonLeft.classList.add('jaw-open');
+    skeletonRight.classList.add('jaw-open');
+    jawTimeoutId = setTimeout(() => {
+      skeletonLeft.classList.remove('jaw-open');
+      skeletonRight.classList.remove('jaw-open');
+      jawTimeoutId = null;
+    }, 4200);
+  }
+
+  // ================== SOUND (mutable) ==================
+  let audioCtx = null;
+  function getAudioCtx(){
+    if(!audioCtx){
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if(Ctx) audioCtx = new Ctx();
+    }
+    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playGrowl(){
+    if(muted) return;
+    const ctx = getAudioCtx();
+    if(!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(110, now);
+    osc.frequency.exponentialRampToValueAtTime(38, now + 0.35);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.exponentialRampToValueAtTime(0.5, now + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+    const lowpass = ctx.createBiquadFilter();
+    lowpass.type = 'lowpass';
+    lowpass.frequency.setValueAtTime(220, now);
+    osc.connect(lowpass).connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.5);
+  }
+
+  let cachedVoices = [];
+  if('speechSynthesis' in window){
+    const loadVoices = () => { cachedVoices = speechSynthesis.getVoices(); };
+    loadVoices();
+    speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  function speakTaunt(){
+    if(muted) return;
+    if(!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance('Крути ещё раз, братишь!');
+    utter.lang = 'ru-RU';
+    utter.pitch = 0.35;
+    utter.rate = 0.82;
+    utter.volume = 1;
+    const ruVoice = cachedVoices.find(v => /ru/i.test(v.lang) && /male|яндекс|milena|ru-ru/i.test(v.name))
+      || cachedVoices.find(v => /ru/i.test(v.lang));
+    if(ruVoice) utter.voice = ruVoice;
+    speechSynthesis.speak(utter);
+  }
+
+  let bubbleTimeoutId = null;
+  function showBubbles(){
+    if(bubbleTimeoutId) clearTimeout(bubbleTimeoutId);
+    skeleBubbleLeft.classList.add('show');
+    skeleBubbleRight.classList.add('show');
+    bubbleTimeoutId = setTimeout(() => {
+      skeleBubbleLeft.classList.remove('show');
+      skeleBubbleRight.classList.remove('show');
+      bubbleTimeoutId = null;
+    }, 2600);
+  }
+
+  function tauntSkeletons(){
+    playGrowl();
+    showBubbles();
+    speakTaunt();
+  }
+
+  muteBtn.addEventListener('click', () => {
+    muted = !muted;
+    muteBtn.classList.toggle('muted', muted);
+    muteBtn.textContent = muted ? '🔇' : '🔊';
+    if(muted && 'speechSynthesis' in window) speechSynthesis.cancel();
+  });
+
+  // ================== SHOP ==================
+  const SLOT_LABELS = { hat:'Голова', eyes:'Глаза', neck:'Шея', body:'Тело', feet:'Обувь', accessory:'Аксессуар' };
+  const SHOP_SLOTS = ['hat','eyes','neck','body','feet','accessory'];
+  const SHOP_ITEMS = {
+    hat: [
+      { id:'hat_none', name:'Без шляпы', price:0, svg:'' },
+      { id:'hat_bandana', name:'Бандана', price:400, svg:'<path d="M34 22 Q60 4 86 22 L82 32 Q60 18 38 32 Z" fill="var(--magenta)" opacity="0.9"/>' },
+      { id:'hat_tophat', name:'Цилиндр', price:1200, svg:'<rect x="44" y="0" width="32" height="20" rx="2" fill="#141018" stroke="var(--gold)" stroke-width="1.5"/><rect x="38" y="18" width="44" height="8" rx="2" fill="#141018" stroke="var(--gold)" stroke-width="1.5"/>' },
+      { id:'hat_crown', name:'Корона', price:5000, svg:'<path d="M40 26 L46 6 L54 20 L60 4 L66 20 L74 6 L80 26 Z" fill="var(--gold)" stroke="var(--gold-deep)" stroke-width="1"/>' }
+    ],
+    eyes: [
+      { id:'eyes_none', name:'Без очков', price:0, svg:'' },
+      { id:'eyes_sun', name:'Тёмные очки', price:300, svg:'<rect x="41" y="35" width="16" height="10" rx="3" fill="#0a0a12" stroke="var(--cyan)" stroke-width="1.2"/><rect x="63" y="35" width="16" height="10" rx="3" fill="#0a0a12" stroke="var(--cyan)" stroke-width="1.2"/><line x1="57" y1="39" x2="63" y2="39" stroke="var(--cyan)" stroke-width="1.2"/>' },
+      { id:'eyes_aviator', name:'Авиаторы', price:800, svg:'<ellipse cx="49" cy="40" rx="9" ry="7" fill="#111" fill-opacity="0.85" stroke="var(--gold)" stroke-width="1.3"/><ellipse cx="71" cy="40" rx="9" ry="7" fill="#111" fill-opacity="0.85" stroke="var(--gold)" stroke-width="1.3"/><line x1="58" y1="40" x2="62" y2="40" stroke="var(--gold)" stroke-width="1.3"/>' }
+    ],
+    neck: [
+      { id:'neck_none', name:'Без украшений', price:0, svg:'' },
+      { id:'neck_scarf', name:'Шарф', price:350, svg:'<path d="M38 84 Q60 96 82 84 L82 94 Q60 106 38 94 Z" fill="var(--lose-red)" opacity="0.85"/>' },
+      { id:'neck_chain', name:'Золотая цепь', price:2500, svg:'<path d="M42 90 Q60 104 78 90" fill="none" stroke="var(--gold)" stroke-width="2" stroke-dasharray="2 3"/><circle cx="60" cy="106" r="5" fill="var(--gold)"/>' }
+    ],
+    body: [
+      { id:'body_none', name:'Без одежды', price:0, svg:'' },
+      { id:'body_vest', name:'Жилет', price:900, svg:'<path d="M42 98 L42 168 L78 168 L78 98 Q60 90 42 98 Z" fill="var(--bg-1)" stroke="var(--cyan)" stroke-width="1.2" opacity="0.85"/>' },
+      { id:'body_jacket', name:'Кожаная куртка', price:3000, svg:'<path d="M34 96 L24 130 L32 140 L38 108 L38 172 L82 172 L82 108 L88 140 L96 130 L86 96 Q60 88 34 96 Z" fill="#1c1024" stroke="var(--magenta)" stroke-width="1.4" opacity="0.92"/>' },
+      { id:'body_cape', name:'Плащ', price:4200, svg:'<path d="M30 94 Q60 84 90 94 L102 226 Q60 246 18 226 Z" fill="#180a26" stroke="var(--magenta)" stroke-width="1.4" opacity="0.8"/>' }
+    ],
+    feet: [
+      { id:'feet_none', name:'Без обуви', price:0, svg:'' },
+      { id:'feet_sneakers', name:'Кроссовки', price:700, svg:'<rect x="26" y="398" width="26" height="12" rx="4" fill="var(--cyan)" opacity="0.85"/><rect x="68" y="398" width="26" height="12" rx="4" fill="var(--cyan)" opacity="0.85"/>' },
+      { id:'feet_boots', name:'Ботинки', price:1500, svg:'<rect x="24" y="382" width="24" height="30" rx="4" fill="#1c1024" stroke="var(--gold)" stroke-width="1.2"/><rect x="72" y="382" width="24" height="30" rx="4" fill="#1c1024" stroke="var(--gold)" stroke-width="1.2"/>' }
+    ],
+    accessory: [
+      { id:'acc_none', name:'Без аксессуара', price:0, svg:'' },
+      { id:'acc_pin', name:'Значок', price:100, svg:'<circle cx="60" cy="112" r="5" fill="var(--gold)" stroke="var(--gold-deep)" stroke-width="1"/>' },
+      { id:'acc_watch', name:'Часы', price:1800, svg:'<rect x="20" y="196" width="12" height="10" rx="2" fill="var(--gold)"/>' }
+    ]
+  };
+
+  function freshEquip(){
+    return { hat:'hat_none', eyes:'eyes_none', neck:'neck_none', body:'body_none', feet:'feet_none', accessory:'acc_none' };
+  }
+  const shopState = {
+    left:  { owned: new Set(['hat_none','eyes_none','neck_none','body_none','feet_none','acc_none']), equipped: freshEquip() },
+    right: { owned: new Set(['hat_none','eyes_none','neck_none','body_none','feet_none','acc_none']), equipped: freshEquip() }
+  };
+  let activeShopSide = 'left';
+
+  function findItem(slot, id){
+    return SHOP_ITEMS[slot].find(it => it.id === id);
+  }
+
+  function renderOutfit(side){
+    const container = side === 'left' ? skeletonLeft : skeletonRight;
+    const outfitGroup = container.querySelector('.outfit');
+    if(!outfitGroup) return;
+    const state = shopState[side];
+    let html = '';
+    SHOP_SLOTS.forEach(slot => {
+      const item = findItem(slot, state.equipped[slot]);
+      if(item && item.svg) html += item.svg;
+    });
+    outfitGroup.innerHTML = html;
+  }
+  renderOutfit('left');
+  renderOutfit('right');
+
+  function renderShopContent(){
+    shopBalanceValue.textContent = balance;
+    const side = activeShopSide;
+    const state = shopState[side];
+    let html = '';
+    SHOP_SLOTS.forEach(slot => {
+      html += `<div class="shop-slot"><div class="shop-slot-title">${SLOT_LABELS[slot]}</div><div class="shop-items">`;
+      SHOP_ITEMS[slot].forEach(item => {
+        const owned = state.owned.has(item.id);
+        const equipped = state.equipped[slot] === item.id;
+        let label, cls, disabled = false;
+        if(equipped){ label = 'НАДЕТО'; cls = 'equipped'; disabled = true; }
+        else if(owned){ label = 'НАДЕТЬ'; cls = 'equip'; }
+        else { label = item.price === 0 ? 'ВЫБРАТЬ' : `КУПИТЬ ${item.price}`; cls = 'buy'; disabled = balance < item.price; }
+        html += `<div class="shop-item">
+          <div class="item-name">${item.name}</div>
+          ${item.price > 0 ? `<div class="item-price">${item.price} ₡</div>` : ''}
+          <button class="${cls}" data-slot="${slot}" data-id="${item.id}" ${disabled ? 'disabled' : ''}>${label}</button>
+        </div>`;
+      });
+      html += `</div></div>`;
+    });
+    shopItemsContainer.innerHTML = html;
+    shopItemsContainer.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => shopAction(activeShopSide, btn.dataset.slot, btn.dataset.id));
+    });
+  }
+
+  function shopAction(side, slot, itemId){
+    const state = shopState[side];
+    const item = findItem(slot, itemId);
+    if(!item) return;
+    if(!state.owned.has(itemId)){
+      if(balance < item.price) return;
+      balance -= item.price;
+      state.owned.add(itemId);
+      updateBalanceDisplay();
+      refreshSpinAvailability();
+    }
+    state.equipped[slot] = itemId;
+    renderOutfit(side);
+    renderShopContent();
+  }
+
+  shopOpenBtn.addEventListener('click', () => {
+    renderShopContent();
+    shopModal.classList.add('show');
+  });
+  shopClose.addEventListener('click', () => shopModal.classList.remove('show'));
+  shopModal.addEventListener('click', (e) => { if(e.target === shopModal) shopModal.classList.remove('show'); });
+  shopTabLeft.addEventListener('click', () => {
+    activeShopSide = 'left';
+    shopTabLeft.classList.add('active');
+    shopTabRight.classList.remove('active');
+    renderShopContent();
+  });
+  shopTabRight.addEventListener('click', () => {
+    activeShopSide = 'right';
+    shopTabRight.classList.add('active');
+    shopTabLeft.classList.remove('active');
+    renderShopContent();
+  });
+
+  // ================== MINI-GAMES ==================
+  const MINIGAMES = [
+    { id:'reaction', name:'Реакция', start: startReactionGame },
+    { id:'memory',   name:'Память',  start: startMemoryGame },
+    { id:'guess',    name:'Угадай число', start: startGuessGame },
+    { id:'rps',      name:'КНБ', start: startRpsGame },
+    { id:'catch',    name:'Поймай монету', start: startCatchGame },
+    { id:'math',     name:'Быстрый счёт', start: startMathGame }
+  ];
+
+  MINIGAMES.forEach(game => {
+    const card = document.createElement('div');
+    card.className = 'mg-card';
+    card.innerHTML = `${game.name}<span class="mg-reward">+10 ₡</span>`;
+    card.addEventListener('click', () => openMinigame(game));
+    mgGrid.appendChild(card);
+  });
+
+  let mgCleanup = null;
+  function openMinigame(game){
+    mgTitle.textContent = game.name;
+    mgBody.innerHTML = '';
+    if(mgCleanup) { mgCleanup(); mgCleanup = null; }
+    mgCleanup = game.start(mgBody, () => finishMinigame(game));
+    mgModal.classList.add('show');
+  }
+  function closeMinigame(){
+    if(mgCleanup) { mgCleanup(); mgCleanup = null; }
+    mgModal.classList.remove('show');
+  }
+  mgClose.addEventListener('click', closeMinigame);
+  mgModal.addEventListener('click', (e) => { if(e.target === mgModal) closeMinigame(); });
+
+  function finishMinigame(game){
+    balance += 10;
+    updateBalanceDisplay();
+    refreshSpinAvailability();
+    mgBody.innerHTML = `<p class="mg-status">Успех! +10 крипиков</p><button class="mg-btn go" id="mgAgainBtn">ЕЩЁ РАЗ</button>`;
+    document.getElementById('mgAgainBtn').addEventListener('click', () => openMinigame(game));
+    if(balance > 0) overlay.classList.remove('show');
+  }
+
+  // ---- 1. Reaction ----
+  function startReactionGame(container, onWin){
+    let timeoutId, ready = false;
+    function render(){
+      container.innerHTML = `<p class="mg-status">Дождись зелёной подсветки и жми на кнопку!</p><button class="mg-btn" id="reactBtn">ЖДИ...</button>`;
+      const btn = container.querySelector('#reactBtn');
+      ready = false;
+      btn.disabled = true;
+      const delay = 900 + Math.random()*2200;
+      timeoutId = setTimeout(() => {
+        ready = true;
+        btn.textContent = 'ЖМИ!';
+        btn.classList.add('go');
+        btn.disabled = false;
+      }, delay);
+      btn.addEventListener('click', () => {
+        if(ready){ onWin(); }
+        else {
+          clearTimeout(timeoutId);
+          container.innerHTML = `<p class="mg-status">Слишком рано! Ещё раз.</p><button class="mg-btn" id="retryBtn">ПОВТОРИТЬ</button>`;
+          container.querySelector('#retryBtn').addEventListener('click', render);
+        }
+      });
+    }
+    render();
+    return () => clearTimeout(timeoutId);
+  }
+
+  // ---- 2. Memory ----
+  function startMemoryGame(container, onWin){
+    const palette = ['#20e6ff', '#ff2ec4', '#ffd23f', '#3affa0'];
+    const sequence = [];
+    for(let i=0;i<3;i++) sequence.push(Math.floor(Math.random()*4));
+    let userStep = 0;
+    let timers = [];
+    container.innerHTML = `<p class="mg-status">Запомни последовательность...</p><div class="mg-tiles" id="mgTiles"></div>`;
+    const tilesWrap = container.querySelector('#mgTiles');
+    const tiles = [];
+    for(let i=0;i<4;i++){
+      const t = document.createElement('button');
+      t.className = 'mg-tile';
+      t.style.background = palette[i];
+      tilesWrap.appendChild(t);
+      tiles.push(t);
+    }
+    function playSequence(){
+      sequence.forEach((idx, step) => {
+        timers.push(setTimeout(() => tiles[idx].classList.add('flash'), step*700));
+        timers.push(setTimeout(() => tiles[idx].classList.remove('flash'), step*700 + 450));
+      });
+      timers.push(setTimeout(enableInput, sequence.length*700 + 200));
+    }
+    function enableInput(){
+      container.querySelector('.mg-status').textContent = 'Повтори последовательность!';
+      tiles.forEach((t, idx) => {
+        t.addEventListener('click', () => {
+          if(idx === sequence[userStep]){
+            t.classList.add('flash');
+            setTimeout(() => t.classList.remove('flash'), 200);
+            userStep++;
+            if(userStep === sequence.length){ onWin(); }
+          } else {
+            container.querySelector('.mg-status').textContent = 'Мимо! Попробуй ещё раз.';
+            tiles.forEach(tt => tt.disabled = true);
+            timers.push(setTimeout(() => startMemoryGame(container, onWin), 1200));
+          }
+        });
+      });
+    }
+    timers.push(setTimeout(playSequence, 600));
+    return () => timers.forEach(clearTimeout);
+  }
+
+  // ---- 3. Guess the number ----
+  function startGuessGame(container, onWin){
+    const target = 1 + Math.floor(Math.random()*10);
+    let attemptsLeft = 3;
+    container.innerHTML = `
+      <p class="mg-status">Загадано число от 1 до 10. Попыток: ${attemptsLeft}</p>
+      <div class="mg-choices" id="mgGuessChoices"></div>`;
+    const wrap = container.querySelector('#mgGuessChoices');
+    for(let n=1;n<=10;n++){
+      const b = document.createElement('button');
+      b.className = 'mg-choice-btn';
+      b.textContent = n;
+      b.addEventListener('click', () => {
+        if(n === target){ onWin(); return; }
+        attemptsLeft--;
+        b.disabled = true;
+        const status = container.querySelector('.mg-status');
+        if(attemptsLeft <= 0){
+          status.textContent = `Не угадал(а). Было число ${target}.`;
+          wrap.querySelectorAll('button').forEach(x => x.disabled = true);
+          const retry = document.createElement('button');
+          retry.className = 'mg-btn';
+          retry.textContent = 'ЕЩЁ РАЗ';
+          retry.addEventListener('click', () => startGuessGame(container, onWin));
+          container.appendChild(retry);
+        } else {
+          status.textContent = (n < target ? 'Больше! ' : 'Меньше! ') + `Осталось попыток: ${attemptsLeft}`;
+        }
+      });
+      wrap.appendChild(b);
+    }
+    return () => {};
+  }
+
+  // ---- 4. Rock-paper-scissors ----
+  function startRpsGame(container, onWin){
+    const options = [
+      { id:'rock', label:'КАМЕНЬ' },
+      { id:'paper', label:'БУМАГА' },
+      { id:'scissors', label:'НОЖНИЦЫ' }
+    ];
+    function beats(a,b){
+      return (a==='rock'&&b==='scissors') || (a==='scissors'&&b==='paper') || (a==='paper'&&b==='rock');
+    }
+    container.innerHTML = `<p class="mg-status">Камень, ножницы, бумага — выбери ход:</p><div class="mg-choices" id="mgRpsChoices"></div>`;
+    const wrap = container.querySelector('#mgRpsChoices');
+    options.forEach(opt => {
+      const b = document.createElement('button');
+      b.className = 'mg-choice-btn';
+      b.textContent = opt.label;
+      b.addEventListener('click', () => {
+        const compChoice = options[Math.floor(Math.random()*3)].id;
+        const status = container.querySelector('.mg-status');
+        if(opt.id === compChoice){
+          status.textContent = 'Ничья! Ходи ещё раз.';
+        } else if(beats(opt.id, compChoice)){
+          onWin();
+        } else {
+          status.textContent = 'Скелет выиграл! Попробуй снова.';
+          wrap.querySelectorAll('button').forEach(x => x.disabled = true);
+          const retry = document.createElement('button');
+          retry.className = 'mg-btn';
+          retry.textContent = 'ЕЩЁ РАЗ';
+          retry.addEventListener('click', () => startRpsGame(container, onWin));
+          container.appendChild(retry);
+        }
+      });
+      wrap.appendChild(b);
+    });
+    return () => {};
+  }
+
+  // ---- 5. Catch the coin ----
+  function startCatchGame(container, onWin){
+    container.innerHTML = `
+      <p class="mg-status">Поймай монету за 5 секунд!</p>
+      <div class="mg-catch-area" id="mgCatchArea">
+        <button class="mg-coin-target" id="mgCoinTarget"></button>
+      </div>`;
+    const area = container.querySelector('#mgCatchArea');
+    const coinBtn = container.querySelector('#mgCoinTarget');
+    function moveCoin(){
+      const maxX = area.clientWidth - 52;
+      const maxY = area.clientHeight - 52;
+      coinBtn.style.left = Math.max(0, Math.random()*maxX) + 'px';
+      coinBtn.style.top = Math.max(0, Math.random()*maxY) + 'px';
+    }
+    moveCoin();
+    const moveInterval = setInterval(moveCoin, 700);
+    coinBtn.addEventListener('click', () => {
+      clearInterval(moveInterval);
+      clearTimeout(failTimeout);
+      onWin();
+    });
+    const failTimeout = setTimeout(() => {
+      clearInterval(moveInterval);
+      container.querySelector('.mg-status').textContent = 'Не успел(а)! Ещё раз?';
+      coinBtn.remove();
+      const retry = document.createElement('button');
+      retry.className = 'mg-btn';
+      retry.textContent = 'ЕЩЁ РАЗ';
+      retry.addEventListener('click', () => startCatchGame(container, onWin));
+      container.appendChild(retry);
+    }, 5000);
+    return () => { clearInterval(moveInterval); clearTimeout(failTimeout); };
+  }
+
+  // ---- 6. Quick math ----
+  function startMathGame(container, onWin){
+    const a = 2 + Math.floor(Math.random()*8);
+    const b = 2 + Math.floor(Math.random()*8);
+    const op = Math.random() < 0.5 ? '+' : '-';
+    const correct = op === '+' ? a + b : a - b;
+    const choices = new Set([correct]);
+    while(choices.size < 4){
+      choices.add(correct + (Math.floor(Math.random()*7) - 3));
+    }
+    const shuffled = Array.from(choices).sort(() => Math.random() - 0.5);
+    container.innerHTML = `<p class="mg-status">Сколько будет ${a} ${op} ${b}?</p><div class="mg-choices" id="mgMathChoices"></div>`;
+    const wrap = container.querySelector('#mgMathChoices');
+    shuffled.forEach(val => {
+      const b2 = document.createElement('button');
+      b2.className = 'mg-choice-btn';
+      b2.textContent = val;
+      b2.addEventListener('click', () => {
+        if(val === correct){ onWin(); }
+        else {
+          container.querySelector('.mg-status').textContent = 'Неверно! Попробуй другой пример.';
+          wrap.querySelectorAll('button').forEach(x => x.disabled = true);
+          setTimeout(() => startMathGame(container, onWin), 900);
+        }
+      });
+      wrap.appendChild(b2);
+    });
+    return () => {};
+  }
+
+  // ================== RESTART ==================
   function restartGame(){
     balance = START_BALANCE;
     updateBalanceDisplay();
