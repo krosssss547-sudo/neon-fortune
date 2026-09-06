@@ -173,7 +173,7 @@
       0 0 0 3px rgba(255,46,196,0.5),
       0 0 40px rgba(32,230,255,0.25),
       inset 0 0 30px rgba(0,0,0,0.6);
-    transition: transform 4.5s cubic-bezier(0.14, 0.83, 0.09, 1);
+    transition: transform 3.6s cubic-bezier(0.14, 0.83, 0.09, 1);
     will-change: transform;
   }
   .sector-label{
@@ -185,18 +185,13 @@
   .sector-label span{
     position:absolute;
     display:inline-block;
-    font-family:'Orbitron', sans-serif;
-    font-weight:700;
-    font-size: clamp(18px, 5.2vw, 22px);
+    font-size: clamp(30px, 8.5vw, 42px);
     white-space:nowrap;
     left:50%; top:50%;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
   }
   .sector-label.win span{
-    color:#3a2b00;
-    text-shadow: 0 0 6px rgba(255,255,255,0.6);
-  }
-  .sector-label.lose span{
-    color: rgba(255,255,255,0.75);
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) drop-shadow(0 2px 3px rgba(0,0,0,0.5));
   }
   .hub{
     position:absolute;
@@ -511,6 +506,93 @@
   .shop-item button.equipped{ background: rgba(255,210,63,0.2); color: var(--gold); border: 1px solid var(--gold); }
   .shop-item button:disabled{ opacity:0.4; cursor:not-allowed; }
  
+  /* ---- leaderboard podium ---- */
+  .podium{
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    gap: 10px;
+    margin: 6px 0 22px;
+  }
+  .podium-col{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap: 6px;
+    width: 92px;
+  }
+  .podium-avatar{
+    width:44px; height:44px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #241a3d, #0a0616 75%);
+    border: 2px solid var(--cyan);
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px;
+    box-shadow: 0 0 10px rgba(32,230,255,0.4);
+  }
+  .podium-col.me .podium-avatar{ border-color: var(--gold); box-shadow: 0 0 12px var(--gold); }
+  .podium-name{
+    font-size: 11px;
+    color:#f1edff;
+    max-width: 88px;
+    text-align:center;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .podium-col.me .podium-name{ color: var(--gold); }
+  .podium-score{
+    font-family:'Orbitron', sans-serif;
+    font-size: 12px;
+    color: var(--gold);
+  }
+  .podium-step{
+    width: 88px;
+    border-radius: 8px 8px 0 0;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding-top: 6px;
+    font-family:'Orbitron', sans-serif;
+    font-weight:900;
+    font-size: 20px;
+    color:#1a0a1e;
+  }
+  .podium-step.first{ height: 92px; background: linear-gradient(180deg, var(--gold), var(--gold-deep)); }
+  .podium-step.second{ height: 66px; background: linear-gradient(180deg, #c7d1e0, #8b93a3); }
+  .podium-step.third{ height: 48px; background: linear-gradient(180deg, #d9945a, #8a5a34); }
+  .leader-list{
+    display:flex;
+    flex-direction:column;
+    gap: 6px;
+  }
+  .leader-row{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    color:#dcd6ff;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .leader-row.me{
+    background: rgba(255,210,63,0.1);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-weight:700;
+  }
+  .leader-rank{ width:20px; opacity:0.7; font-family:'Orbitron', sans-serif; }
+  .leader-name{
+    flex:1;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .leader-score{ font-family:'Orbitron', sans-serif; color: var(--gold); }
+  .leader-row.me .leader-score{ color: var(--gold); }
+ 
   /* ---- mini-game modal body ---- */
   .mg-body{ display:flex; flex-direction:column; align-items:center; gap:14px; padding: 4px 0; }
   .mg-btn{
@@ -735,6 +817,7 @@
     <button class="icon-btn" id="muteBtn" title="Выключить звук">🔊</button>
     <button class="shop-open-btn" id="shopOpenBtn">🛍 МАГАЗИН</button>
     <button class="shop-open-btn" id="gamesOpenBtn">🎮 МИНИ-ИГРЫ</button>
+    <button class="shop-open-btn" id="topOpenBtn">🏆 ТОП</button>
   </div>
  
   <div class="wheel-wrap">
@@ -798,6 +881,18 @@
   </div>
 </div>
  
+<div class="modal" id="topModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>ТОП ИГРОКОВ</h3>
+      <button class="modal-close" id="topClose">✕</button>
+    </div>
+    <div class="podium" id="podiumWrap"></div>
+    <div class="leader-list" id="leaderList"></div>
+    <p style="color:var(--text-dim); font-size:11px; margin:14px 0 0; text-align:center;">Показатели других игроков — демонстрационные (локальная игра без сервера). Ваш результат — реальный, лучший достигнутый баланс.</p>
+  </div>
+</div>
+ 
 <div class="modal" id="shopModal">
   <div class="modal-box">
     <div class="modal-header">
@@ -808,6 +903,7 @@
     <div class="shop-tabs">
       <button class="shop-tab active" id="shopTabLeft">ЛЕВЫЙ СКЕЛЕТ</button>
       <button class="shop-tab" id="shopTabRight">ПРАВЫЙ СКЕЛЕТ</button>
+      <button class="shop-tab" id="shopTabTheme">🎨 ТЕМЫ КОЛЕСА</button>
     </div>
     <div id="shopItemsContainer"></div>
   </div>
@@ -835,6 +931,14 @@
   const WIN_MULTIPLIER = 5;
   const MIN_BET = 1;
   const MAX_BET = 1000;
+  const SPIN_DURATION_MS = 3600;
+ 
+  const THEMES = [
+    { id:'classic',   name:'Классика',       price:0,    win:'#ffd23f', loseA:'#3a2166', loseB:'#170c2a', accent:'#20e6ff', bg1:'#0e0821', bg0:'#07040f' },
+    { id:'cyberpunk', name:'Киберпанк',      price:1500, win:'#39ff14', loseA:'#0d0221', loseB:'#2d0140', accent:'#00fff2', bg1:'#1a0533', bg0:'#050014' },
+    { id:'gold',      name:'Золотое колесо', price:3000, win:'#fff8dc', loseA:'#4a3200', loseB:'#241900', accent:'#ffd23f', bg1:'#2a1d05', bg0:'#0d0800' },
+    { id:'retro',     name:'Ретро-арт',      price:2000, win:'#ff6b6b', loseA:'#2b2d42', loseB:'#1a1a2e', accent:'#ffb703', bg1:'#241933', bg0:'#0a0812' }
+  ];
  
   // ================== STATE ==================
   let balance = START_BALANCE;
@@ -842,9 +946,13 @@
   let spinning = false;
   let currentRotation = 0;
   let muted = false;
+  let bestBalance = START_BALANCE;
+  const SAVE_KEY = 'neonFortuneSave_v1';
+  const themeState = { owned: new Set(['classic']), equipped: 'classic' };
  
   // ================== ELEMENTS ==================
   const wheelEl = document.getElementById('wheel');
+  const pointerEl = document.querySelector('.pointer');
   const balanceEl = document.getElementById('balanceValue');
   const resultEl = document.getElementById('resultLine');
   const chipRow = document.getElementById('chipRow');
@@ -862,10 +970,16 @@
   const shopBalanceValue = document.getElementById('shopBalanceValue');
   const shopTabLeft = document.getElementById('shopTabLeft');
   const shopTabRight = document.getElementById('shopTabRight');
+  const shopTabTheme = document.getElementById('shopTabTheme');
   const shopItemsContainer = document.getElementById('shopItemsContainer');
   const gamesOpenBtn = document.getElementById('gamesOpenBtn');
   const gamesModal = document.getElementById('gamesModal');
   const gamesClose = document.getElementById('gamesClose');
+  const topOpenBtn = document.getElementById('topOpenBtn');
+  const topModal = document.getElementById('topModal');
+  const topClose = document.getElementById('topClose');
+  const podiumWrap = document.getElementById('podiumWrap');
+  const leaderList = document.getElementById('leaderList');
   const mgGridOverlay = document.getElementById('mgGridOverlay');
   const mgGridModal = document.getElementById('mgGridModal');
   const mgModal = document.getElementById('mgModal');
@@ -874,17 +988,35 @@
   const mgBody = document.getElementById('mgBody');
  
   // ================== WHEEL VISUALS ==================
-  const colors = [];
-  for(let i=0;i<SECTORS;i++){
-    colors.push(WIN_INDICES.includes(i) ? '#ffd23f' : (i % 2 === 0 ? '#3a2166' : '#170c2a'));
+  const WIN_ICON = '💎';
+  const LOSE_ICONS = ['🪙', '🚀', '🎁'];
+ 
+  function buildWheelGradient(theme){
+    const colors = [];
+    for(let i=0;i<SECTORS;i++){
+      colors.push(WIN_INDICES.includes(i) ? theme.win : (i % 2 === 0 ? theme.loseA : theme.loseB));
+    }
+    const parts = [];
+    for(let i=0;i<SECTORS;i++){
+      const start = i*SECTOR_ANGLE;
+      const end = start+SECTOR_ANGLE;
+      parts.push(`${colors[i]} ${start}deg ${end}deg`);
+    }
+    wheelEl.style.background = `conic-gradient(from 0deg, ${parts.join(', ')})`;
   }
-  let gradientParts = [];
-  for(let i=0;i<SECTORS;i++){
-    const start = i*SECTOR_ANGLE;
-    const end = start+SECTOR_ANGLE;
-    gradientParts.push(`${colors[i]} ${start}deg ${end}deg`);
+ 
+  function findTheme(id){
+    return THEMES.find(t => t.id === id) || THEMES[0];
   }
-  wheelEl.style.background = `conic-gradient(from 0deg, ${gradientParts.join(', ')})`;
+ 
+  function applyTheme(themeId){
+    const theme = findTheme(themeId);
+    document.documentElement.style.setProperty('--bg-1', theme.bg1);
+    document.documentElement.style.setProperty('--bg-0', theme.bg0);
+    if(pointerEl) pointerEl.style.borderTopColor = theme.accent;
+    if(wheelWrapEl) wheelWrapEl.style.filter = `drop-shadow(0 0 30px ${theme.accent}66)`;
+    buildWheelGradient(theme);
+  }
  
   const dividerLayer = document.createElement('div');
   dividerLayer.style.position = 'absolute';
@@ -921,7 +1053,7 @@
     label.className = 'sector-label ' + (isWin ? 'win' : 'lose');
     const span = document.createElement('span');
     span.dataset.angle = centerAngle;
-    span.textContent = isWin ? '$' : '☠';
+    span.textContent = isWin ? WIN_ICON : LOSE_ICONS[i % LOSE_ICONS.length];
     label.appendChild(span);
     wheelEl.appendChild(label);
   }
@@ -975,6 +1107,8 @@
   function updateBalanceDisplay(){
     balanceEl.textContent = balance;
     shopBalanceValue.textContent = balance;
+    if(balance > bestBalance) bestBalance = balance;
+    saveState();
   }
  
   function pickResultIndex(){
@@ -1018,8 +1152,10 @@
     let delta = targetAngleWithinCircle - currentMod;
     delta = ((delta % 360) + 360) % 360;
  
-    currentRotation += extraSpins*360 + delta + jitter;
+    const spinDelta = extraSpins*360 + delta + jitter;
+    currentRotation += spinDelta;
     wheelEl.style.transform = `rotate(${currentRotation}deg)`;
+    runSpinTicks(spinDelta, SPIN_DURATION_MS);
  
     setTimeout(() => {
       spinning = false;
@@ -1033,6 +1169,8 @@
         launchCoinRain();
         showYakBanner();
         openSkeletonJaws();
+        playFanfare();
+        if(navigator.vibrate) navigator.vibrate([90, 40, 90, 40, 140]);
         if(balance > 0) overlay.classList.remove('show');
       } else {
         resultEl.textContent = 'МИМО. ПОПРОБУЙТЕ ЕЩЁ';
@@ -1046,7 +1184,7 @@
         overlay.classList.add('show');
       }
       refreshSpinAvailability();
-    }, 4600);
+    }, SPIN_DURATION_MS);
   }
  
   // ---- лёгкая вибрация/тряска после остановки колеса ----
@@ -1211,6 +1349,90 @@
     return audioCtx;
   }
  
+  // ---- воспроизводит короткий "щелчок трещотки" на каждый пройденный сектор ----
+  function playTick(){
+    if(muted) return;
+    const ctx = getAudioCtx();
+    if(!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(1500, now);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.16, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.05);
+  }
+ 
+  // ---- яркий восходящий фанфар при победе ----
+  function playFanfare(){
+    if(muted) return;
+    const ctx = getAudioCtx();
+    if(!ctx) return;
+    const now = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((freq, i) => {
+      const t = now + i*0.09;
+      const osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.32, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.32);
+    });
+  }
+ 
+  // ---- имитация той же кубической кривой замедления, что и CSS-transition колеса ----
+  function makeCubicBezier(p1x, p1y, p2x, p2y){
+    function bezier(t, p1, p2){
+      const c = 3*p1, b = 3*(p2-p1)-c, a = 1-c-b;
+      return ((a*t+b)*t+c)*t;
+    }
+    function slope(t, p1, p2){
+      const c = 3*p1, b = 3*(p2-p1)-c, a = 1-c-b;
+      return (3*a*t+2*b)*t+c;
+    }
+    return function(x){
+      let t = x;
+      for(let i=0;i<8;i++){
+        const diff = bezier(t, p1x, p2x) - x;
+        const s = slope(t, p1x, p2x);
+        if(Math.abs(s) < 1e-6) break;
+        t -= diff/s;
+        if(t < 0) t = 0; else if(t > 1) t = 1;
+      }
+      return bezier(t, p1y, p2y);
+    };
+  }
+  const SPIN_EASE = makeCubicBezier(0.14, 0.83, 0.09, 1);
+ 
+  // ---- проигрывает тик + лёгкую вибрацию на каждый пройденный сектор в реальном времени ----
+  function runSpinTicks(totalDeltaDeg, durationMs){
+    const startTs = performance.now();
+    let lastSectorCount = 0;
+    function frame(now){
+      const elapsed = now - startTs;
+      if(elapsed >= durationMs) return;
+      const tFraction = Math.min(1, elapsed / durationMs);
+      const traveled = SPIN_EASE(tFraction) * totalDeltaDeg;
+      const sectorsPassed = Math.floor(traveled / SECTOR_ANGLE);
+      if(sectorsPassed > lastSectorCount){
+        const steps = sectorsPassed - lastSectorCount;
+        for(let k=0;k<steps;k++) playTick();
+        if(navigator.vibrate) navigator.vibrate(8);
+        lastSectorCount = sectorsPassed;
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+ 
   function playGrowl(){
     if(muted) return;
     const ctx = getAudioCtx();
@@ -1277,11 +1499,12 @@
     muteBtn.classList.toggle('muted', muted);
     muteBtn.textContent = muted ? '🔇' : '🔊';
     if(muted && 'speechSynthesis' in window) speechSynthesis.cancel();
+    saveState();
   });
  
   // ================== SHOP ==================
-  const SLOT_LABELS = { hat:'Голова', eyes:'Глаза', neck:'Шея', body:'Тело', feet:'Обувь', accessory:'Аксессуар' };
-  const SHOP_SLOTS = ['hat','eyes','neck','body','feet','accessory'];
+  const SLOT_LABELS = { hat:'Голова', eyes:'Глаза', neck:'Шея', body:'Тело', feet:'Обувь', accessory:'Аксессуар', weapon:'В руке' };
+  const SHOP_SLOTS = ['hat','eyes','neck','body','feet','accessory','weapon'];
   const SHOP_ITEMS = {
     hat: [
       { id:'hat_none', name:'Без шляпы', price:0, svg:'' },
@@ -1314,17 +1537,61 @@
       { id:'acc_none', name:'Без аксессуара', price:0, svg:'' },
       { id:'acc_pin', name:'Значок', price:100, svg:'<circle cx="60" cy="112" r="5" fill="var(--gold)" stroke="var(--gold-deep)" stroke-width="1"/>' },
       { id:'acc_watch', name:'Часы', price:1800, svg:'<rect x="20" y="196" width="12" height="10" rx="2" fill="var(--gold)"/>' }
+    ],
+    weapon: [
+      { id:'weapon_none', name:'Пусто', price:0, svg:'' },
+      { id:'weapon_cane', name:'Трость', price:250, svg:'<path d="M90 200 L90 402" stroke="var(--gold)" stroke-width="2.6" stroke-linecap="round"/><path d="M84 197 Q90 187 96 197" fill="none" stroke="var(--gold)" stroke-width="2.6" stroke-linecap="round"/>' },
+      { id:'weapon_sword', name:'Меч', price:1800, svg:'<line x1="90" y1="148" x2="90" y2="262" stroke="#dfe8ff" stroke-width="3" stroke-linecap="round"/><line x1="79" y1="197" x2="101" y2="197" stroke="var(--gold)" stroke-width="3" stroke-linecap="round"/><line x1="90" y1="197" x2="90" y2="214" stroke="#7a5a1e" stroke-width="4" stroke-linecap="round"/>' },
+      { id:'weapon_scythe', name:'Коса', price:4500, svg:'<line x1="90" y1="118" x2="90" y2="420" stroke="#2a2a2a" stroke-width="3" stroke-linecap="round"/><path d="M90 118 Q132 98 120 150 Q100 142 90 150 Z" fill="none" stroke="var(--cyan)" stroke-width="2.6"/>' }
     ]
   };
  
   function freshEquip(){
-    return { hat:'hat_none', eyes:'eyes_none', neck:'neck_none', body:'body_none', feet:'feet_none', accessory:'acc_none' };
+    return { hat:'hat_none', eyes:'eyes_none', neck:'neck_none', body:'body_none', feet:'feet_none', accessory:'acc_none', weapon:'weapon_none' };
   }
   const shopState = {
-    left:  { owned: new Set(['hat_none','eyes_none','neck_none','body_none','feet_none','acc_none']), equipped: freshEquip() },
-    right: { owned: new Set(['hat_none','eyes_none','neck_none','body_none','feet_none','acc_none']), equipped: freshEquip() }
+    left:  { owned: new Set(['hat_none','eyes_none','neck_none','body_none','feet_none','acc_none','weapon_none']), equipped: freshEquip() },
+    right: { owned: new Set(['hat_none','eyes_none','neck_none','body_none','feet_none','acc_none','weapon_none']), equipped: freshEquip() }
   };
   let activeShopSide = 'left';
+ 
+  // ================== SAVE / LOAD ==================
+  function saveState(){
+    try{
+      const data = {
+        balance, muted, bestBalance,
+        shop: {
+          left:  { owned: Array.from(shopState.left.owned),  equipped: shopState.left.equipped },
+          right: { owned: Array.from(shopState.right.owned), equipped: shopState.right.equipped }
+        },
+        theme: { owned: Array.from(themeState.owned), equipped: themeState.equipped }
+      };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    }catch(e){ /* хранилище недоступно — просто продолжаем без сохранения */ }
+  }
+ 
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(SAVE_KEY);
+      if(!raw) return;
+      const data = JSON.parse(raw);
+      if(typeof data.balance === 'number') balance = data.balance;
+      if(typeof data.muted === 'boolean') muted = data.muted;
+      if(typeof data.bestBalance === 'number') bestBalance = data.bestBalance;
+      ['left','right'].forEach(side => {
+        const saved = data.shop && data.shop[side];
+        if(!saved) return;
+        if(Array.isArray(saved.owned)) shopState[side].owned = new Set(saved.owned);
+        if(saved.equipped) shopState[side].equipped = Object.assign(freshEquip(), saved.equipped);
+      });
+      if(data.theme){
+        if(Array.isArray(data.theme.owned)) themeState.owned = new Set(data.theme.owned);
+        if(data.theme.equipped) themeState.equipped = data.theme.equipped;
+      }
+    }catch(e){ /* повреждённые данные — используем значения по умолчанию */ }
+  }
+  loadState();
+  applyTheme(themeState.equipped);
  
   function findItem(slot, id){
     return SHOP_ITEMS[slot].find(it => it.id === id);
@@ -1347,6 +1614,7 @@
  
   function renderShopContent(){
     shopBalanceValue.textContent = balance;
+    if(activeShopSide === 'theme'){ renderThemeShop(); return; }
     const side = activeShopSide;
     const state = shopState[side];
     let html = '';
@@ -1373,6 +1641,44 @@
     });
   }
  
+  function renderThemeShop(){
+    let html = `<div class="shop-slot"><div class="shop-slot-title">ЦВЕТОВАЯ СХЕМА КОЛЕСА И ФОНА</div><div class="shop-items">`;
+    THEMES.forEach(theme => {
+      const owned = themeState.owned.has(theme.id);
+      const equipped = themeState.equipped === theme.id;
+      let label, cls, disabled = false;
+      if(equipped){ label = 'ПРИМЕНЕНО'; cls = 'equipped'; disabled = true; }
+      else if(owned){ label = 'ПРИМЕНИТЬ'; cls = 'equip'; }
+      else { label = theme.price === 0 ? 'ВЫБРАТЬ' : `КУПИТЬ ${theme.price}`; cls = 'buy'; disabled = balance < theme.price; }
+      html += `<div class="shop-item">
+        <div class="item-name">${theme.name}</div>
+        ${theme.price > 0 ? `<div class="item-price">${theme.price} ₡</div>` : ''}
+        <button class="${cls}" data-theme="${theme.id}" ${disabled ? 'disabled' : ''}>${label}</button>
+      </div>`;
+    });
+    html += `</div></div>`;
+    shopItemsContainer.innerHTML = html;
+    shopItemsContainer.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => themeAction(btn.dataset.theme));
+    });
+  }
+ 
+  function themeAction(themeId){
+    const theme = findTheme(themeId);
+    if(!theme) return;
+    if(!themeState.owned.has(themeId)){
+      if(balance < theme.price) return;
+      balance -= theme.price;
+      themeState.owned.add(themeId);
+      updateBalanceDisplay();
+      refreshSpinAvailability();
+    }
+    themeState.equipped = themeId;
+    applyTheme(themeId);
+    renderShopContent();
+    saveState();
+  }
+ 
   function shopAction(side, slot, itemId){
     const state = shopState[side];
     const item = findItem(slot, itemId);
@@ -1387,6 +1693,7 @@
     state.equipped[slot] = itemId;
     renderOutfit(side);
     renderShopContent();
+    saveState();
   }
  
   shopOpenBtn.addEventListener('click', () => {
@@ -1399,18 +1706,78 @@
     activeShopSide = 'left';
     shopTabLeft.classList.add('active');
     shopTabRight.classList.remove('active');
+    shopTabTheme.classList.remove('active');
     renderShopContent();
   });
   shopTabRight.addEventListener('click', () => {
     activeShopSide = 'right';
     shopTabRight.classList.add('active');
     shopTabLeft.classList.remove('active');
+    shopTabTheme.classList.remove('active');
+    renderShopContent();
+  });
+  shopTabTheme.addEventListener('click', () => {
+    activeShopSide = 'theme';
+    shopTabTheme.classList.add('active');
+    shopTabLeft.classList.remove('active');
+    shopTabRight.classList.remove('active');
     renderShopContent();
   });
  
   gamesOpenBtn.addEventListener('click', () => gamesModal.classList.add('show'));
   gamesClose.addEventListener('click', () => gamesModal.classList.remove('show'));
   gamesModal.addEventListener('click', (e) => { if(e.target === gamesModal) gamesModal.classList.remove('show'); });
+ 
+  // ================== LEADERBOARD (ТОП) ==================
+  const BOT_LEADERS = [
+    { name:'CyberWolf94',  score: 8200 },
+    { name:'НЕОН_МАКС',    score: 6400 },
+    { name:'GhostRider',   score: 5100 },
+    { name:'Луна_77',      score: 3900 },
+    { name:'PixelKatya',   score: 3200 },
+    { name:'ShadowFox',    score: 2600 },
+    { name:'ByteBandit',   score: 1800 },
+    { name:'NightOwl_88',  score: 1100 },
+    { name:'RookieRider',  score: 450 }
+  ];
+ 
+  function renderLeaderboard(){
+    const playerScore = Math.max(bestBalance, balance);
+    const all = BOT_LEADERS.map(b => ({ name:b.name, score:b.score, isPlayer:false }));
+    all.push({ name:'ВЫ', score: playerScore, isPlayer:true });
+    all.sort((a,b) => b.score - a.score);
+ 
+    const top3 = all.slice(0,3);
+    const rest = all.slice(3, 10);
+ 
+    function col(entry, place){
+      if(!entry) return `<div class="podium-col"><div class="podium-avatar">—</div><div class="podium-name">—</div><div class="podium-score"></div><div class="podium-step ${place}">${place==='first'?1:place==='second'?2:3}</div></div>`;
+      const avatar = entry.isPlayer ? '🧑' : '💀';
+      return `<div class="podium-col ${entry.isPlayer?'me':''}">
+        <div class="podium-avatar">${avatar}</div>
+        <div class="podium-name">${entry.name}</div>
+        <div class="podium-score">${entry.score} ₡</div>
+        <div class="podium-step ${place}">${place==='first'?1:place==='second'?2:3}</div>
+      </div>`;
+    }
+ 
+    podiumWrap.innerHTML = col(top3[1],'second') + col(top3[0],'first') + col(top3[2],'third');
+ 
+    leaderList.innerHTML = rest.map((p, idx) => `
+      <div class="leader-row ${p.isPlayer?'me':''}">
+        <span class="leader-rank">${idx+4}</span>
+        <span class="leader-name">${p.name}</span>
+        <span class="leader-score">${p.score} ₡</span>
+      </div>
+    `).join('');
+  }
+ 
+  topOpenBtn.addEventListener('click', () => {
+    renderLeaderboard();
+    topModal.classList.add('show');
+  });
+  topClose.addEventListener('click', () => topModal.classList.remove('show'));
+  topModal.addEventListener('click', (e) => { if(e.target === topModal) topModal.classList.remove('show'); });
  
   // ================== MINI-GAMES ==================
   const MINIGAMES = [
@@ -1671,6 +2038,8 @@
   // ================== RESTART ==================
   spinBtn.addEventListener('click', spin);
  
+  muteBtn.classList.toggle('muted', muted);
+  muteBtn.textContent = muted ? '🔇' : '🔊';
   updateBalanceDisplay();
   refreshSpinAvailability();
 })();
